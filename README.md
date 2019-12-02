@@ -8,38 +8,51 @@ create database coincenter;
 use coincenter;
 
 create table users (
-user_name VARCHAR(255),
-email VARCHAR(255),
-user_id INTEGER AUTO_INCREMENT PRIMARY KEY);
+user_name VARCHAR(255) not null,
+email VARCHAR(255) not null,
+user_id INTEGER not null AUTO_INCREMENT PRIMARY KEY);
 
 create table coins (
-coin_name VARCHAR(255),
+coin_name VARCHAR(255) not null,
 price DECIMAL(10,2),
-coin_id INTEGER PRIMARY KEY);
+coin_id INTEGER not null PRIMARY KEY);
+
+create table account1(
+account_id INTEGER not null AUTO_INCREMENT PRIMARY KEY,
+user_id INTEGER not null,
+cash DECIMAL(10,2),
+qty INTEGER,
+constraint account1_user_id_fk foreign key (user_id) references users (user_id) on delete cascade);
 
 create table blotter (
-blotter_id INTEGER AUTO_INCREMENT PRIMARY KEY, 
-user_id INTEGER, 
+blotter_id INTEGER not null AUTO_INCREMENT PRIMARY KEY, 
+user_id INTEGER not null, 
 price DECIMAL(10,2), 
 amount DECIMAL(10,2),
-askbid VARCHAR(255),
+bidask VARCHAR(255),
 qty INTEGER,
 blotter_time time, 
-coin_id INTEGER,
+coin_id INTEGER not null,
+account_id INTEGER not null,
 constraint blotter_user_id_fk foreign key (user_id) references users (user_id) on delete cascade,
-constraint blotter_coin_id_fk foreign key (coin_id) references coins (coin_id) on delete cascade
+constraint blotter_coin_id_fk foreign key (coin_id) references coins (coin_id) on delete cascade,
+constraint blotter_account_id_fk foreign key (account_id) references account1 (account_id) on delete cascade
 );
 
 create table pnl (
-pnl_id INTEGER PRIMARY KEY, 
-coin_id INTEGER, 
-asset DECIMAL(10,2),
+pnl_id INTEGER not null PRIMARY KEY, 
+coin_id INTEGER not null, 
+account_id INTEGER not null,
 total_qty INTEGER,
+market_price DECIMAL(10,2),
+bid INTEGER,
+ask INTEGER,
 vwap DECIMAL(10,2),
 rpl DECIMAL(10,2), 
 urpl DECIMAL(10,2), 
 pnl_time TIME,
-constraint pnl_coin_id_fk foreign key (coin_id) references coins (coin_id) on delete cascade
+constraint pnl_coin_id_fk foreign key (coin_id) references coins (coin_id) on delete cascade,
+constraint pnl_account_id_fk foreign key (account_id) references account1 (account_id) on delete cascade
 );
 
 create table graph (
