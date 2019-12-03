@@ -7,61 +7,45 @@ create database coincenter;
 
 use coincenter;
 
-create table users (
-user_name VARCHAR(255) not null,
-email VARCHAR(255) not null,
-user_id INTEGER not null AUTO_INCREMENT PRIMARY KEY);
+create table blotter (
+    blotter_id int not null auto_increment primary key,
+    coin_id int not null,
+    askbid varchar(4),
+    qty decimal (10,2),
+    price decimal(10,2),
+    time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    balance decimal(10,2)    
+);
 
 create table coins (
-coin_name VARCHAR(255) not null,
-price DECIMAL(10,2),
-coin_id INTEGER not null PRIMARY KEY);
-
-create table account1(
-account_id INTEGER not null AUTO_INCREMENT PRIMARY KEY,
-user_id INTEGER not null,
-cash DECIMAL(10,2),
-qty INTEGER,
-constraint account1_user_id_fk foreign key (user_id) references users (user_id) on delete cascade);
-
-create table blotter (
-blotter_id INTEGER not null AUTO_INCREMENT PRIMARY KEY, 
-user_id INTEGER not null, 
-price DECIMAL(10,2), 
-amount DECIMAL(10,2),
-bidask VARCHAR(255),
-qty INTEGER,
-blotter_time time, 
-coin_id INTEGER not null,
-account_id INTEGER not null,
-constraint blotter_user_id_fk foreign key (user_id) references users (user_id) on delete cascade,
-constraint blotter_coin_id_fk foreign key (coin_id) references coins (coin_id) on delete cascade,
-constraint blotter_account_id_fk foreign key (account_id) references account1 (account_id) on delete cascade
+ coin_id int not null auto_increment primary key,
+ coin_type varchar(3)
 );
 
-create table pnl (
-pnl_id INTEGER not null PRIMARY KEY, 
-coin_id INTEGER not null, 
-account_id INTEGER not null,
-total_qty INTEGER,
-market_price DECIMAL(10,2),
-bid INTEGER,
-ask INTEGER,
-vwap DECIMAL(10,2),
-rpl DECIMAL(10,2), 
-urpl DECIMAL(10,2), 
-pnl_time TIME,
-constraint pnl_coin_id_fk foreign key (coin_id) references coins (coin_id) on delete cascade,
-constraint pnl_account_id_fk foreign key (account_id) references account1 (account_id) on delete cascade
+create table pnl(
+    pnl_id int not null auto_increment primary key,
+    coin_id int,
+    inventory decimal(10,2),
+    VWAP decimal (10,2),
+    RPL  decimal (10,2),
+    URPL decimal (10,2),
+    time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    constraint pnl_coin_id_fk foreign key (coin_id) references coins (coin_id) on delete cascade
 );
 
-create table graph (
-graph_id INTEGER AUTO_INCREMENT PRIMARY KEY, 
-coin_id INTEGER, 
-pnl_id INTEGER,
-rpl DECIMAL(10,2), 
-urpl DECIMAL(10,2),
-pnl_time TIME,
-constraint graph_coin_id_fk foreign key (coin_id) references coins (coin_id) on delete cascade,
-constraint graph_pnl_id_fk foreign key (pnl_id) references pnl (pnl_id) on delete cascade
-)
+create table graph(
+  graph_id int not null auto_increment primary key,
+  coin_id int not null,
+  RPL  decimal (10,2),
+  URPL decimal (10,2),
+  pnl_id int not null,
+  time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  constraint graph_coin_id_fk foreign key (coin_id) references coins (coin_id) on delete cascade,
+  constraint graph_pnl_id_fk foreign key (pnl_id) references pnl (pnl_id) on delete cascade
+  );
+
+insert into coins values (1,'BTC'),(2,'ETH'),(3,'LTC');
+
+insert into pnl (coin_id,inventory,VWAP,RPL,URPL) values (1,0,0,0,0);
+insert into pnl (coin_id,inventory,VWAP,RPL,URPL) values (2,0,0,0,0);
+insert into pnl (coin_id,inventory,VWAP,RPL,URPL) values (3,0,0,0,0);
